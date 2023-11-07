@@ -1,0 +1,136 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4wide}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{artmacros}
+\usepackage{bm}
+\usepackage{graphicx}
+
+\begin{document}
+\title{Analysis of ECG Signals \\ Part B: Heart Rate Variability \\ Project in SSY130 }
+\author{Tomas McKelvey}
+
+\maketitle{}
+\section{Introduction}
+In part one of the project the analysis of the heart rate was made
+based on a very simplified model, i.e.,\ the assumption that the heart
+beats are periodic. However, a closer analysis of the heart beats
+reveals that the beats are appearing at irregular time instances. This
+variability has many physiological sources and can be of clinical use
+for monitoring and diagnostic  purposes. The overall phenomenon of the
+irregularity of the heart beats is called \emph{heart rate variability
+  (HRV)} and can be analyses in several ways. In this project you will
+develop some signal processing tools and use them to assess the
+HRV found in some ECG recordings provided. You find all data and
+scripts on the git page \texttt{https://git.chalmers.se/tomas.mckelvey/ssy130-ecg-analysis.git}
+
+\subsection{ECG Data}
+\label{sec:ecg-data}
+
+The data for this project task are long term ECG readings obtained
+with a sampling frequency of 128 Hz. The origin of the data is ``MIT-BIH Normal
+Sinus Rhythm Database''  from the PhysioNet database
+\cite{goldberger2000physiobank}.  Note that some of the recordings
+have poor quality for the first minutes of recordings. You can
+disregard these data in your analysis. 
+
+\subsection{RR Interval}
+\label{sec:r-r-interval}
+
+All heart rate variability analysis depart from the \emph{RR
+  interval} which is the time between two consecutive heart
+beats. The electrical pattern in an ECG signal has several parts which
+origins from the different phases a heart experience during a heart
+beat. The different phases are named P-Q-R-S-T waves, see illustration
+in Figure~\ref{fig:pqrst}. The R-wave is the segment which is mostly
+pronounced and is, in a normal ECG, a fast large peak. Hence, to pin down an ECG
+complex to a specific time instance the peak of the R-wave is often used and
+the time elapsed between to consecutive R-peaks is hence called the RR
+interval.
+
+In order to successfully apply HRV analysis the RR intervals need to
+be accurately estimated. This essentially boils down to the have a
+robust method to detect the location of the peak of the R-wave.   
+
+\subsection{Tasks}
+\begin{enumerate}
+\item The script \texttt{hrvRRdetect.m} illustrates how the ECG data
+  is loaded and how results can be plotted. Complete the file with
+  code which detects the R peaks and plot the R-peak detections in the
+  ECG graph. The R-wave is characterised by rapid changes, i.e. the
+  derivative is high. This property could be utilized in the detection
+  bny using a FIR filter which calculates the derivative of the signal.  
+  The following issues should be considered.
+  \begin{itemize}
+  \item For some individuals the ECG has a high gain and for some
+    lower gain. The peak detection method should automatically
+    compensate for this.
+  \item In some cases there is a slowly varying bias, i.e.\ the
+    baseline is drifting. Remove this effect by some appropriate filter.
+  \end{itemize}
+  Using a FIR local model approach with monomial basis functions and
+  using the derivative as the output could be one possibility. 
+\item The respiratory activity has an impact on the RR intervals and
+  the IHR. Analyze this in some of the ECG traces and try to determine
+  the respiratory rate.   
+\item It is clear that it is almost impossible to find a filtering
+  and peak detection method which is fail-safe. In order to further analyze
+  the RR intervals the data need to be curated by removing so called
+  outliers in the data. In the sequence of RR intervals should an
+  outlier be removed or replaced by neighbour data?
+\item We can define the instantaneous heart rate (IHR) as the rate (in
+  beats/min) that a given RR interval indicates. Derive the
+  expression of the IHR if the RR interval is $q$ samples and the
+  sampling frequency is $f_s=128$ Hz. Use this calculation when
+  scale the IHR when plotting it. 
+\item For each new R-peak detected a new RR interval can be
+  determined. This implies that the RR interval data are obtained at a
+  non-equidistant time instances. Discuss how such data should be
+  plotted and further analyzed with respect to this issue. 
+\end{enumerate}
+
+\subsection{Analysis of  long term HRV data}
+The variability of the RR intervals around an average gives some
+indications of the status of the individual. A high variability of the
+RR interval is a recognized index of the ability of the cardiovascular
+system to cope with environmental challenges.
+\subsection{Tasks}
+\begin{enumerate}
+\item Create a script that segment the ECG data into 1 minute
+  parts. For each segment derive the RR intervals and calculate the
+  mean value and the standard deviation. This analysis will generate
+  two new time series with a sampling interval of 1 minute. Plot the result and discuss
+  the long term variation seen in the data.  
+\end{enumerate}
+
+\subsection{(Optional) Long term frequency analysis of the
+  RR intervals}
+\label{sec:optional-long-term}
+The RR intervals time-series can also be analysed using Fourier
+Analysis to reveal various periodic behavior. RR intervals manifest
+short-term oscillations in a frequency range between 0 and 0.5 Hz,
+which appear to be the result of
+intrinsic autonomic rhythms and of respiratory inputs. Spectral
+analysis of RR intervals provides an estimate on how power (i.e.,
+variance) of the signal is distributed as a function of frequency. RR
+intervals appear to be organized in three major components, the
+high-frequency (HF) ($>$ 0.15 Hz) respiratory band, the low-frequency
+(LF) band (around 0.1 Hz) and the very–low-frequency (VLF) band
+(0.003-0.039 Hz). The HF components of RR variability primarily
+reflect the respiration-driven modulation of sinus rhythm. Feel free
+to experiment with your code and see if the data reveals the HF, LF
+and VLF components mentioned above. 
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\columnwidth]{SinusRhythmLabels.png}
+  \caption{ECG wave and the sub-waves. Created by Agateller (Anthony Atkielski), converted to svg by atom. - SinusRhythmLabels.png, Public Domain, https://commons.wikimedia.org/w/index.php?curid=1560893 }  \label{fig:pqrst}
+\end{figure}
+
+
+\label{sec:introduction}
+\bibliographystyle{IEEEtran}
+\bibliography{/Users/mckelvey/Downloads/My_Library.bib}
+\end{document}
