@@ -1,7 +1,7 @@
 % This script plots the HR estimation results for all athletes
 
-load('Data/ath.mat');
-load('Data/VisualHr.mat');
+load('dataA/ath.mat');
+load('dataA/VisualHr.mat');
 close all
 
 fs = 500;
