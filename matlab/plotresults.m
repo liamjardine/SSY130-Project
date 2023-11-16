@@ -20,17 +20,24 @@ for ath = 1:Nath
     end
 end
 
+lineWid = 1.2;
+fontS = 24;
 figure(1)
 % Plot esimate for all leads and all athletes
-plot(kron(ones(Nleads,1),(1:Nath)'),results(:),'+','MarkerSize',14)
+plot(kron(ones(Nleads,1),(1:Nath)'),results(:),'+','MarkerSize',14,'LineWidth', lineWid)
 hold on
 % Plot the Visual heart rate
-plot(1:Nath,VisualHr,'or','MarkerSize',14);
-plot(1:Nath,mean(results'),'d','MarkerSize',14);
-plot(1:Nath,median(results'),'s','MarkerSize',14);
+plot(1:Nath,mean(results'),'d','MarkerSize',14,'LineWidth', lineWid);
+plot(1:Nath,median(results'),'sk','MarkerSize',14,'LineWidth', lineWid);
+plot(1:Nath,VisualHr,'or','MarkerSize',14,'LineWidth', lineWid+0.3);
 hold off
 %RMS error for the median estimates over  all athletes
-norm(VisualHr.'-median(results'))/sqrt(Nath)
+disp("RMS error:  " + norm(VisualHr.'-median(results'))/sqrt(Nath))
+legend("Estimates for each lead", "Mean", "Median","Visual estimate", "FontSize", fontS,Location="nw")
+xlabel("Athlete number","FontSize", fontS)
+ylabel("BPM","FontSize", fontS)
+ax = gca;
+ax.FontSize = fontS;
 
 
 
