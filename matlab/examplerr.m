@@ -3,7 +3,7 @@ dd = dir('dataB/*.mat');
 Nfiles = length(dd);
 
 NN = 8000; % Length of Data to analyze and plot
-offset = 4000; %Offset into the dataset
+offset = 5000; %Offset into the dataset
 
 fs = 128;
 
@@ -11,7 +11,7 @@ for ff = 1:Nfiles
     load(['dataB/',dd(ff).name]);
     x0 = data(offset+(1:NN),1);
 
-    % Here is a lmfir_diff filter designed (needs to be completed)
+    % Here is a lmfir_diff filter designed
     p=4;
     M=int32(fs/7);
     m0=M;
@@ -30,7 +30,7 @@ for ff = 1:Nfiles
     plot(0.1*x0,"DisplayName", "Trace")
     % You need to set MPH and MPD to some good values....
 
-    MPH = .5;   %TODO: Normalise
+    MPH = .5;   
     MPD = 50;
     [p,r_indices] = findpeaks(y1diff,'MinPeakHeight',MPH,'MinPeakDistance',MPD);
     plot(r_indices,p,'hr',"DisplayName", "RR samples")
