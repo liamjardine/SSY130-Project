@@ -5,23 +5,39 @@ Nfiles = length(dd);
 fs = 128;
 N_samples = fs*60;
 
+
+
+
+
+
+clc
 for ff = 1:Nfiles
     load(['dataB/',dd(ff).name]);
     trace = data(:,1);
-    std_arr = [];
-    ave_arr = [];
 
+    % Here is a lmfir_diff filter designed (needs to be completed)
+    p=4;
+    M=int32(fs/7);
+    m0=M;
+    h1diff = lmfir_diff(@monofun,@monoderfun, p,M,m0);
     
-    for minute=1:(floor(length(trace)/N_samples))-1
-        x0 = trace((1:N_samples)+minute*N_samples);
+    minutes = 1:(floor(length(trace)/N_samples))-1;
 
-        % Here is a lmfir_diff filter designed (needs to be completed)
-        p=4;
-        M=int32(fs/7);
-        m0=M;
+    std_arr = zeros(length(minutes),1);
+    ave_arr = zeros(length(minutes),1);
+
+    addpath('C:\code\Chalmers_Code\M1\AppliedSP\SSY130-Project\matlab\matlab-ParforProgress2-1.23.1')
+    percentage_update = 0.1;
+    do_debug = 1;
+    run_javaaddpath = 1; 
+    show_execution_time = 1;
+    %ppm = ParforProgressStarter2('test', length(minutes), percentage_update, do_debug, run_javaaddpath, show_execution_time);
+disp("doing:  " + ff)
+
+    parfor minute=minutes
+        x0 = trace((1:N_samples)+minute*N_samples);
     
         x0_high = highpass(x0,3,fs);
-        h1diff = lmfir_diff(@monofun,@monoderfun, p,M,m0);
         y1diff = filter(h1diff,1,x0_high);
         y1diff = y1diff/max(abs(y1diff));
         
@@ -34,18 +50,24 @@ for ff = 1:Nfiles
         rr = diff(r_indices);
         bpm = (1./rr)*fs*60;
         time_axis = r_indices(1:end-1)/fs;
-    
+        if isempty(bpm)
+            std_arr(minute+1,ff) = 0;
+            ave_arr(minute+1,ff) = 0;
+            continue
+        end
+
         if remove_outliers
         [time_axis, bpm] = outliers(time_axis,bpm,4);
         end
-    
-        std_arr = [std_arr std(bpm)];
-        ave_arr = [ave_arr mean(bpm)];
+        
+        std_arr(minute+1,ff) = std(bpm);
+        ave_arr(minute+1,ff) = mean(bpm);
+
     end
-    plot(std_arr,"DisplayName", "STD")
-    plot(ave_arr,"DisplayName", "Average")
-    pause
+    save("ansfile"+ff+".mat","std_arr", "ave_arr")
+    delete(ppm)
 end 
+
 
 function f = monofun(i,m) 
     if i==0
