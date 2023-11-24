@@ -1,5 +1,5 @@
 clear
-load("all.mat")
+load("all_long.mat")
 close all; clf
 
 limit = 1200;
