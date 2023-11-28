@@ -31,7 +31,7 @@ for ff = 1:Nfiles
     % You need to set MPH and MPD to some good values....
 
     MPH = .5;   
-    MPD = 50;
+    MPD = 40;
     [p,r_indices] = findpeaks(y1diff,'MinPeakHeight',MPH,'MinPeakDistance',MPD);
     plot(r_indices,p,'hr',"DisplayName", "RR samples")
     hold off
