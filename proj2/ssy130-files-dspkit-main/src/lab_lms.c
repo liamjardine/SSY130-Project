@@ -425,15 +425,22 @@ void my_lms(float const * y, float const * x, float * xhat, float * e, int block
 	/* TODO: Add code from here...
 	 *
 	 * doing block_size lms update iterations, i.e. something like:
-	 * 
-	 * int n;
-	 * for(n <range 0 - block_size>){ 		   		//Which order should we loop n over? [0, 1, 2, ..., block_size]? [block_size, ..., 1, 0]?
-	 *   float * y_book = &lms_state[<some index>]; //Here we create a new pointer, which we call y_book, using the notation in the course book. Which index of lms_state should we use to set up y_book?
-	 *   xhat[n] = lms_coeffs * y_book;             //Here '*' implies the dot product. Either use arm_dot_prod_f32 or use a loop to compute xhat[n]
-	 *   e[n] = x[n] - xhat[n];                		//e[n] is a scalar, so do we need to do any looping here?
-	 *   lms_coeffs += 2 * mu * y_book * e[n];      //Use some type of loop to update the vector lms_coeffs with the vector y multiplied by scalars 2, mu, e[n].
-	 * }
-	 * ...to here */
+	 */
+	 int n;
+	 for (n = 0; n<block_size; n++){ 		   		//Which order should we loop n over? [0, 1, 2, ..., block_size]? [block_size, ..., 1, 0]?
+	 	float * y_book = &lms_state[n]; //Here we create a new pointer, which we call y_book, using the notation in the course book. Which index of lms_state should we use to set up y_book?
+	    float * x_grej = &xhat[n];
+		arm_dot_prod_f32(lms_coeffs, y_book, block_size, x_grej); 
+		          //Here '*' implies the dot product. Either use arm_dot_prod_f32 or use a loop to compute xhat[n]
+	    e[n] = x[n] - *x_grej;                		//e[n] is a scalar, so do we need to do any looping here?
+	 	int m;
+		for (m = 0; m<lms_taps; m++){
+			lms_coeffs[m] += 2 * lms_mu * y_book[m] * e[n];
+		}
+		//lms_coeffs += 2 * mu * y_book * e[n];      //Use some type of loop to update the vector lms_coeffs with the vector y multiplied by scalars 2, mu, e[n].
+	}
+	 /* to here */
+
 #endif
 
 	/* Update lms state, ensure the lms_taps-1 first values correspond to the
