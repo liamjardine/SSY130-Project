@@ -39,7 +39,7 @@ size_t lms_err_buf_idx;
 float lms_err_buf_time;
 float lms_mu = LAB_LMS_MU_INIT;
 uint_fast32_t seed;		 // PRNG seed for gaussian noise generator
-size_t n_lms_taps = 430; // Number of LMS taps to use right now
+size_t n_lms_taps = 128; // Number of LMS taps to use right now
 
 // enum type for different modes of operation
 enum lms_modes
