@@ -460,7 +460,8 @@ void my_lms(float const *y, float const *x, float *xhat, float *e, int block_siz
 #else
 
 	int n, m;
-	float temp[4];
+	float temp[4]; // Increases speed just so slightly instead of update coeffs like +=y*e
+	float err;
 	for (n = 0; n < block_size; n++)
 	{															 // Looping n over [0, 1, 2, ..., block_size]
 		float *y_book = &lms_state[n];							 // New pointer y_book, using n as index
@@ -468,10 +469,10 @@ void my_lms(float const *y, float const *x, float *xhat, float *e, int block_siz
 		arm_dot_prod_f32(lms_coeffs, y_book, lms_taps, x_hat_n); // Dot product using arm_dot_prod_f32
 		e[n] = x[n] - *x_hat_n;									 // e[n] is a scalar, so no looping needed
 
-		float err = 2 * lms_mu * e[n];
+		err = 2 * lms_mu * e[n];
 
 		// High score of 634 taps without error message.
-		for (m = 0; m < lms_taps; m += 4) // Slightly illegal but we know there is guardspace when less than 1000 elements.
+		for (m = 0; m < lms_taps; m += 4) // Slightly illegal but we know there is guard space when less than 1020 elements.
 		{
 			temp[0] = y_book[m] * err;
 			temp[1] = y_book[m + 1] * err;
