@@ -458,23 +458,32 @@ void my_lms(float const *y, float const *x, float *xhat, float *e, int block_siz
 #include "../../secret_sauce.h"
 	DO_LMS();
 #else
-	/* TODO: Add code from here...
-	 *
-	 * doing block_size lms update iterations, i.e. something like:
-	 */
+
 	int n, m;
+	float temp[4];
 	for (n = 0; n < block_size; n++)
 	{															 // Looping n over [0, 1, 2, ..., block_size]
 		float *y_book = &lms_state[n];							 // New pointer y_book, using n as index
 		float *x_hat_n = &xhat[n];								 // New pointer x_hat_n, using n as index
 		arm_dot_prod_f32(lms_coeffs, y_book, lms_taps, x_hat_n); // Dot product using arm_dot_prod_f32
 		e[n] = x[n] - *x_hat_n;									 // e[n] is a scalar, so no looping needed
-		for (m = 0; m < lms_taps; m++)
+
+		float err = 2 * lms_mu * e[n];
+
+		// High score of 634 taps without error message.
+		for (m = 0; m < lms_taps; m += 4) // Slightly illegal but we know there is guardspace when less than 1000 elements.
 		{
-			lms_coeffs[m] += 2 * lms_mu * y_book[m] * e[n]; // Using for loop to update the vector lms_coeffs with the vector y multiplied by scalars 2, mu, e[n].
+			temp[0] = y_book[m] * err;
+			temp[1] = y_book[m + 1] * err;
+			temp[2] = y_book[m + 2] * err;
+			temp[3] = y_book[m + 3] * err;
+
+			lms_coeffs[m] += temp[0];
+			lms_coeffs[m + 1] += temp[1];
+			lms_coeffs[m + 2] += temp[2];
+			lms_coeffs[m + 3] += temp[3];
 		}
 	}
-	/* to here */
 
 #endif
 
